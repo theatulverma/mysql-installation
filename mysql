@@ -1,0 +1,27 @@
+MySQL Server on Ubuntu
+
+sudo apt-get update
+sudo apt-get install mysql-server
+sudo mysql_secure_installation utility
+#Allow remote access
+sudo ufw enable
+sudo ufw allow mysql
+sudo systemctl start mysql
+sudo systemctl enable mysql
+sudo systemctl restart mysql
+/usr/bin/mysql -u root -p
+#or versions earlier than MySQL 5.7, enter the following command in the mysql shell, replace password with your new password:
+
+UPDATE mysql.user SET Password = PASSWORD('password') WHERE User = 'root';
+
+UPDATE mysql.user SET authentication_string = PASSWORD('password') WHERE User = 'root';
+FLUSH PRIVILEGES;
+SELECT User, Host, authentication_string FROM mysql.user;
+
+
+
+
+
+
+Refernce :
+https://support.rackspace.com/how-to/installing-mysql-server-on-ubuntu/
