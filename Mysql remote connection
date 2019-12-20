@@ -1,0 +1,148 @@
+Mysql server backup from remote login command 
+Do ssh in the server 
+           # ssh  root@10.0.0.5 
+2.  Follow command to take mysql dump 
+
+#mysqldump -h <hostname> -u  <db_user_name>   <db_name>  -p  >path_to_save_backup_file< backupTIIMESTAMP.sql>
+
+3. Copy file from server to local machine
+ 
+  Do scp from localhost to remote server
+
+# scp  <user_name>@<hostname or IP > :/path/backupTIMESTAMP.sql   <path to save>
+
+Example :
+serverIP:  10.0.0.1
+Username: atul
+Password: atul1234
+Dbname: demo
+Dbusername: root
+Dbpassword: atul6342
+
+ 
+[user@localhost ~]$ ssh  atul@10.0.0.1
+EnterPassword: _
+
+[ atul@10.0.0.1 ~] $ mysqldump  -u root  demo -p > backup22jul18_01:02.sql 
+
+[ atul@10.0.0.1 ~] $ ls -lrt
+
+. … …. . …   backup22jul18_01:02.sql 
+Ctrl+d <exit>
+
+[user@localhost ~]$  scp  atul@10.0.0.1:/home/atul/backup22jul18_01:02.sql    .
+EnterPassword:_
+
+…………………………………………………………………………………….. 100 % filename
+
+[user@localhost ~]$ ls
+
+.. .. ..   backup22jul18_01:02.sql
+ 
+
+
+How to restore database(dump) on Mysql server 
+
+Copy dump file local to server (if you dont have to access data server from local )
+
+[user@localhost ~]$  scp backup22jul18_01:02.sql  root@10.0.0.2:/root 
+     EnterPassword:_
+
+   …………………………………………………………………………………….. 100 %   backup22jul18_01:02.sql
+
+#
+Do ssh in the server 
+           # ssh  root@10.0.0.2
+
+[ root@10.0.0.2 ~] $ mysql  -u root  demo1   -p <  backup22jul18_01:02.sql 
+
+ EnterPassword:_
+
+[ root@10.0.0.2 ~] $ mysql  -u root -p
+ EnterPassword:_
+
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql                         |
+| performance_schema |
+| sys                               |
+| demo1                         |
++--------------------+
+5 rows in set (0.00 sec)
+
+
+mysql> \q
+
+[ root@10.0.0.2 ~] $ _
+
+
+
+If database schema is not created in the database server in which i have to restore 
+Here are the process to create a database schema as per your requirement name
+
+
+[ root@10.0.0.2 ~] $ mysql  -u root -p
+ EnterPassword:_
+
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql                         |
+| performance_schema |
+| sys                               |
+| demo1                         |
++--------------------+
+5 rows in set (0.00 sec)
+
+mysql> create database deadpool;
+
+myql> grant all privileges on deadpool TO `root`@`%`;
+
+mysql> FLUSH ALL PRIVILEGES;
+
+mysql> \q
+
+[ root@10.0.0.2 ~] $ mysql  -u root  deadpool  -p <  backup22jul18_01:02.sql 
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql                         |
+| performance_schema |
+| sys                               |
+| demo1   
+| deadpool                     |
++--------------------+
+6 rows in set (0.00 sec)
+
+mysql> \q
+
+[ root@10.0.0.2 ~] $_
+
+How to create database user in AWS sql server
+
+# mysql -h <....rds.amazonaws.com> -u linuxpoint -p
+now in RDS instance (mysql) shell prompt.
+Note: User: awspoint  and DatabaseName: linux_point –  replace this both with your database name and user name and remove “<>” this. 
+mysql> CREATE USER '<awspoint>'@'%' IDENTIFIED BY '<password>';
+mysql> CREATE DATABASE <linux_point>;
+mysql> GRANT ALL PRIVILEGES on <linux_point>.* To <awspoint>@'%';
+mysql> GRANT ALL PRIVILEGES ON `<linux_point>`.* TO '<awspoint>'@'%';
+mysql> FLUSH PRIVILEGES;
+Now you have to exit this, mysql> \q;
+
+And now you be able to login with new user with new_database
+# mysql -h <....rds.amazonaws.com> -u <awspoint> --database <linux_point> -p
+mysql>_
+# mysql -h <....rds.amazonaws.com> -u <awspoint> --database <linux_point> -p < dump.sql
+
+
